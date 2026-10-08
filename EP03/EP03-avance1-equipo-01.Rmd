@@ -1,0 +1,161 @@
+---
+title: "EP03"
+author: "Equipo 01"
+date: "08-10-2026"
+output:
+  html_document:
+    toc: true # Activa la tabla de contenidos (índice)
+    toc_float: true # Permite que el índice se mueva al hacer scroll
+    toc_depth: 3 # Define la cantidad de niveles de títulos
+    theme: flatly # Tema visual (bootstrap)
+    highlight: pygments # Define el estilo del código (colores)
+    df_print: paged # Hace paginado al mostrar data frames
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, # Muestra código R en el documento
+  # warning   = FALSE, # Oculta advertencias
+  message = FALSE, # Oculta mensajes (como los de carga de paquetes)
+  fig.align = "center", # Centra imágenes
+  fig.width = 7,
+  fig.height = 4 # Parámetros para el tamaño de gráficas
+)
+```
+
+```{r, include=FALSE}
+
+```
+```{r}
+
+```
+# Contexto
+Una exportadora compra cerezas a dos huertos, uno con riego tradicional y otro con riego tecnificado.
+Por los registros de temporadas anteriores, se sabe que el calibre (el diámetro) de las cerezas sigue una distribución normal con una desviación estándar de 2 mm.
+El jefe de calidad quiere comprobar que el calibre medio es de 28 mm, y para eso va a medir 100 cerezas, 50 de cada huerto.
+Además, cree que el huerto tecnificado tiene más cerezas de calibre exportable que el tradicional.
+
+## Lectura de datos
+
+# Pregunta 1
+El jefe de calidad rechazará que el calibre medio es 28 mm si la media de la muestra es menor que 27,6 mm o mayor que 28,4 mm.
+Supongan que el verdadero calibre medio es 28,5 mm.
+Hagan un gráfico con las dos distribuciones muestrales, la hipotética y la verdadera, y marquen y calculen α y β.
+¿Qué significa, para la exportadora, cometer un error de tipo II en este caso?
+
+
+## Pregunta de investigación
+
+
+
+## Datos
+
+
+
+## Formulación de hipótesis
+
+
+
+## Estadístico de interés
+
+
+## Remuestreo
+
+
+
+## Conclusión
+
+----
+
+
+# Pregunta 2
+Hagan el gráfico del poder de esta prueba suponiendo que el verdadero calibre medio puede ir de 27 a 29 mm. 
+¿Cuánto vale el poder cuando el calibre medio es exactamente 28 mm? ¿Por qué?
+
+
+## Pregunta de investigación
+
+
+
+## Datos
+
+
+
+## Formulación de hipótesis
+
+
+
+## Estadístico de interés
+
+
+## Remuestreo
+
+
+
+## Conclusión
+
+----
+
+# Pregunta 3
+Si el verdadero calibre medio fuera 28,5 mm, ¿cuántas cerezas habría que medir para tener un poder de 0,8 con α = 0,05?
+
+
+## Pregunta de investigación
+
+
+
+## Datos
+
+
+
+## Formulación de hipótesis
+
+
+
+## Estadístico de interés
+
+
+## Remuestreo
+
+
+
+## Conclusión
+
+----
+
+# Pregunta 4
+El jefe de calidad cree que alrededor del 96 % de las cerezas del huerto tecnificado son de calibre exportable, contra el 90 % del tradicional. 
+Supongan que las cerezas de la pregunta 3 se reparten en partes iguales entre los dos huertos.
+¿Alcanza esa muestra para detectar la diferencia que el jefe de calidad cree que hay entre los huertos, con el mismo nivel de significación (0,05) y un poder de al menos 0,8? 
+Si no alcanza, ¿cuántas cerezas de cada huerto harían falta?
+
+## Pregunta de investigación
+
+
+
+## Datos
+
+
+
+## Formulación de hipótesis
+
+
+
+## Estadístico de interés
+
+
+## Remuestreo
+
+
+
+## Conclusión
+
+
+
+
+
+----
+
+# Referencias
+
+Jara, J. L., & Köhler, J. (s. f.). Inferencia y modelos estadísticos [Perusall].
