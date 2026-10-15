@@ -1,0 +1,71 @@
+---
+title: "EP04-avance1-equipo-01.Rmd"
+output: html_document
+date: "2026-10-15"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Una agencia de marketing desea determinar si hay una diferencia significativa en la efectividad de tres estrategias publicitarias utilizadas para promocionar un nuevo producto. Para ello, se ha recopilado información de personas que fueron expuestas a las tres estrategias publicitarias, registrando si mostraron una aceptación (A) o rechazo (R) a cada una de ellas.
+¿Qué puede concluir la agencia de marketing sobre la efectividad de las estrategias publicitarias para promover el nuevo producto?
+Indicación: obtengan la muestra de 50 personas del archivo "EP04 Datos.csv", que se adjunta a esta tarea, usando la semilla 112
+
+Respuesta: Se utilizara una prueba Q de cohran, ya que vamos a realizar un estudio de las mismas mediciones repetidas y cumple las condiciones para hacerla.
+
+  1. La variable de respuesta es dicotocomica: por completar
+  2. La variable independiente es categorica: Con 3 grupos independientes.
+  3. Los bloques son independientes entre sí
+  4. Tiene un tamaño de muestra suficientemente grande.
+  
+Hipotesis: H0: la proporcion de exitos es la misma en las 3 publicidades.
+H1: La proporcion de exitos es distinta en al menos una de las mediciones.
+
+2) Una organización de conservación de la fauna silvestre estudia manadas de tres tipos de animales herbívoros en reservas naturales africanas. Durante tres días consecutivos del mes de febrero, se registró la especie de los animales que se acercaron a beber agua al principal afluente de cada una de las reservas Etosha y Mahago, hasta completar 30 observaciones en cada reserva. Se registraron 4 elefantes, 21 antílopes y 5 cebras en la primera, y 14 elefantes, 7 antílopes y 9 cebras en la segunda.
+¿Existe evidencia de que la proporción de especies es la misma en ambas reservas?
+
+
+Respuesta: Prueba elegida 2: Chi-Cuadrado homogeneidad, tenemos 2 grupos independientes con n(tamaños de muestra) fijos y quiero calcular la distribucion de una variable categorica.
+
+Hipotesis:
+
+H0 = la proporcion de especies es la misma para ambas reservas.
+
+H1: En al menos un nivel de las proporciones son distintas en ambas especies.
+
+Condiciones: Observaciones independientes
+Hay más de 2 categorias( El enunciado nos da 3 especies)
+
+La frecuencia de cada categoria es >= 5. Asumo esto dsp lo verifico con el codigo.
+
+
+
+P3) Una organización dedicada a la rehabilitación de villanos ha observado que muchos de ellos ingresan al programa con niveles elevados de hostilidad. Para abordar este problema, decidieron implementar un nuevo programa de bienvenida diseñado para reducir la hostilidad y facilitar la reintegración a la sociedad. Para evaluar la efectividad de este programa, se reclutó a un grupo de 20 villanos a quienes se les midió el nivel de hostilidad (alto o bajo) antes y después de participar en el programa de bienvenida. Los resultados se presentan a continuación: 2 villanos no mostraron hostilidad ni antes ni después. 15 villanos que inicialmente mostraban hostilidad dejaron de hacerlo.2 villanos mantuvieron un elevado nivel de hostilidad.el otro villano desarrolló síntomas de hostilidad tras participar en el programa cuando antes no era hostil.
+¿Qué se puede concluir acerca de la efectividad del nuevo programa de bienvenida para reducir la hostilidad en los villanos?
+----
+R3)
+La prueba elegida es una Prueba de McNemar, porque permite determinar si se produce o no un cambio significativo en las proporciones observadas entre ambas mediciones, cosa que se quiere saber en la pregunta inicial sobre lo que se puede concluir acerca de la efectividad del nuevo programa de bienvenida para reducir la hostilidad en los villanos.
+
+3.2 Hipótesis
+- **H0:** La proporción de villanos con alta hostilidad es igual antes y después del programa.
+- **HA:** La proporción de villanos con alta hostilidad es distinta antes y después del programa.
+
+Condiciones
+1. La variable de respuesta es dicotómica. -> *Se cumple (Hostilidad Alta/Baja).*
+2. La variable independiente es categórica con 2 niveles que agrupan muestras dependientes (pareadas). -> *Se cumple (Antes y Después en los mismos 20 villanos).*
+3. Las observaciones son independientes entre los sujetos. -> *Se asume del enunciado.*
+
+
+P4) Durante un apocalipsis zombie, un grupo de 10 mujeres y 14 hombres sobrevivientes se encuentra buscando desesperadamente refugio y encuentran dos edificios abandonados que podrían servir: una escuela y un centro comercial. Algunas personas piensan que la escuela es más segura, mientras que otras consideran que el centro comercial es más seguro. Cada persona elige por separado, sin conocer la elección de las demás, y se observa que 6 mujeres y 10 hombres eligen refugiarse en la escuela abandonada mientras que los otros optan por el centro comercial.
+¿Hay relación entre el sexo de la persona y el edificio abandonado que encuentra más seguro?
+
+R4)
+Utilizaremos la prueba exacta de fisher debido a que es una prueba diseñada para analizar si existe **asociación o independencia** entre dos variables cualitativas dicotómicas, el experimento cumple con todas las condiciones, 2 variables binarias {tabla 2x2}, observaciones esperadas menores a 5 y observaciones independientes
+
+$H_0$: No hay relación entre el sexo de la persona y el edificio abandonado que encuentra más seguro.
+    
+- $H_A$: Existe una relacion entre el sexo de la persona y el edificio abandonado que encuentra más seguro.
+
+
+
