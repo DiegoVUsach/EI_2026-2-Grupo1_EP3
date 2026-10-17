@@ -1,0 +1,156 @@
+---
+title: "EP04-avance1-equipo-01.Rmd"
+output: html_document
+date: "2026-10-15"
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+library(RVAideMemoire)
+library(rcompanion)
+
+```
+
+Pregunta 1) Una agencia de marketing desea determinar si hay una diferencia significativa en la efectividad de tres estrategias publicitarias utilizadas para promocionar un nuevo producto. Para ello, se ha recopilado información de personas que fueron expuestas a las tres estrategias publicitarias, registrando si mostraron una aceptación (A) o rechazo (R) a cada una de ellas.
+¿Qué puede concluir la agencia de marketing sobre la efectividad de las estrategias publicitarias para promover el nuevo producto?
+Indicación: obtengan la muestra de 50 personas del archivo "EP04 Datos.csv", que se adjunta a esta tarea, usando la semilla 112
+
+Respuesta: Se utilizara una prueba Q de cohran, ya que vamos a realizar un estudio de las mismas mediciones repetidas y cumple las siguientes condiciones.
+
+  1. La variable de respuesta es dicotocomica: Se cumple, ya que las variables son Apruebo (A) o Rechazo(R)
+  2. La variable independiente es categorica: Se cumple ya que hay 3 grupos dependientes.
+  3. Los bloques son independientes entre sí
+  4. Tiene un tamaño de muestra suficientemente grande.
+  
+Hipotesis:
+
+H0: la proporcion de aprobacion es la misma en las 3 estrategias de publicidades.
+H1: La proporcion de aprobacion es distinta en al menos una de las estrategias de publicidad.
+
+
+```{r}
+# Lectura de datos
+datos <- read.csv("EP04 Datos.csv", sep = ";", stringsAsFactors = TRUE)
+set.seed(112)
+muestra_p1 <- datos %>% sample_n(50)
+
+# Transformación a formato largo
+datos_largos <- muestra_p1 %>%
+  pivot_longer(cols = starts_with("estrategia"), 
+               names_to = "Estrategia", 
+               values_to = "Respuesta") %>%
+  mutate(Sujeto = as.factor(rep(1:50, each = 3)))
+
+datos_largos$Respuesta <- as.factor(datos_largos$Respuesta)
+datos_largos$Estrategia <- as.factor(datos_largos$Estrategia)
+
+# Prueba Q de Cochran
+prueba_q <- cochran.qtest(Respuesta ~ Estrategia | Sujeto, data = datos_largos)
+print(prueba_q)
+
+# Justificación Post-hoc: Al ser 3 estrategias, si se rechaza H0, 
+#Se usa un procedimiento post-hoc para identificar qué pares difieren.
+posthoc_p1 <- pairwiseMcnemar(Respuesta ~ Estrategia | Sujeto, 
+                              data = datos_largos, method = "holm")
+print(posthoc_p1)
+
+```
+
+Conclusion 1: 
+
+2) Una organización de conservación de la fauna silvestre estudia manadas de tres tipos de animales herbívoros en reservas naturales africanas. Durante tres días consecutivos del mes de febrero, se registró la especie de los animales que se acercaron a beber agua al principal afluente de cada una de las reservas Etosha y Mahago, hasta completar 30 observaciones en cada reserva. Se registraron 4 elefantes, 21 antílopes y 5 cebras en la primera, y 14 elefantes, 7 antílopes y 9 cebras en la segunda.
+
+¿Existe evidencia de que la proporción de especies es la misma en ambas reservas?
+
+Respuesta: Prueba elegida 2: Chi-Cuadrado homogeneidad, tenemos 2 grupos independientes con n(tamaños de muestra) fijos y quiero calcular la distribucion de una variable categorica.
+
+Hipotesis:
+
+H0 = La proporcion de especies es la misma para ambas reservas.
+H1: En al menos un nivel de las proporciones son distintas en ambas reservas.
+
+Condiciones: Observaciones independientes.
+Hay más de 2 categorias(El enunciado nos da 3 especies)
+
+La frecuencia de cada categoria es >= 5.
+
+```{r}
+tabla_preg2 <- matrix(c(4, 21, 5,14, 7, 9), nrow = 2, byrow = TRUE, dimnames = list("Reserva" = c("Etosha", "Mahago"),"Especie" = c("Elefante", "Antilope", "Cebra")))
+
+# Verificación de la condición de frecuencias esperadas con chiq.test
+verificador_p2 <- chisq.test(tabla_preg2)$expected
+print(verificador_p2)
+
+#Justificación Post-hoc: Al rechazar H0 y tener 3 especies, HACE FALTA un 
+# análisis post hoc para identificar en qué especies radican las diferencias.
+```
+
+P3) Una organización dedicada a la rehabilitación de villanos ha observado que muchos de ellos ingresan al programa con niveles elevados de hostilidad. Para abordar este problema, decidieron implementar un nuevo programa de bienvenida diseñado para reducir la hostilidad y facilitar la reintegración a la sociedad. Para evaluar la efectividad de este programa, se reclutó a un grupo de 20 villanos a quienes se les midió el nivel de hostilidad (alto o bajo) antes y después de participar en el programa de bienvenida. Los resultados se presentan a continuación: 2 villanos no mostraron hostilidad ni antes ni después. 15 villanos que inicialmente mostraban hostilidad dejaron de hacerlo.2 villanos mantuvieron un elevado nivel de hostilidad.el otro villano desarrolló síntomas de hostilidad tras participar en el programa cuando antes no era hostil.
+¿Qué se puede concluir acerca de la efectividad del nuevo programa de bienvenida para reducir la hostilidad en los villanos?
+
+----
+R3)
+La prueba elegida es una Prueba de McNemar, porque permite determinar si se produce o no un cambio significativo en las proporciones observadas entre ambas mediciones, cosa que se quiere saber en la pregunta inicial sobre lo que se puede concluir acerca de la efectividad del nuevo programa de bienvenida para reducir la hostilidad en los villanos.
+
+3.2 Hipótesis
+- **H0:** La proporción de villanos con alta hostilidad es igual antes y después del programa.
+- **HA:** La proporción de villanos con alta hostilidad es distinta antes y después del programa.
+
+Condiciones:
+
+La variable de respuesta es dicotómica: Si, son Hostilidad Alta/Baja.
+La variable independiente es categórica con 2 niveles que agrupan muestras pareadas: Se cumple Antes y Después en los mismos 20 sujetos.
+
+Las observaciones son independientes entre los sujetos
+
+Pares discordantes: 15 que mejoraron + 1 que empeoró por lo tanto son pares discordantes.
+
+```{r}
+ tablita_p3 <- matrix(c(2, 1, 
+                     15, 2), 
+                   nrow = 2, byrow = TRUE,
+                   dimnames = list("Antes" = c("Baja", "Alta"), 
+                                   "Despues" = c("Baja", "Alta")))
+
+# McNemar
+prueba_mcnemar <- mcnemar.test(tablita_p3, correct = FALSE)
+print(prueba_mcnemar)
+```
+
+Conclusión Pregunta 3: El valor 0.00046 es menor a 0.05, por lo que se rechaza la hipótesis nula.
+
+P4) Durante un apocalipsis zombie, un grupo de 10 mujeres y 14 hombres sobrevivientes se encuentra buscando desesperadamente refugio y encuentran dos edificios abandonados que podrían servir: una escuela y un centro comercial. Algunas personas piensan que la escuela es más segura, mientras que otras consideran que el centro comercial es más seguro. Cada persona elige por separado, sin conocer la elección de las demás, y se observa que 6 mujeres y 10 hombres eligen refugiarse en la escuela abandonada mientras que los otros optan por el centro comercial.
+¿Hay relación entre el sexo de la persona y el edificio abandonado que encuentra más seguro?
+
+R4)
+Se desea evaluar si existe asociación o independencia entre dos variables cualitativas dicotómicas (Sexo y Edificio) en una tabla de 2x2. Al revisar las frecuencias esperadas, se detectan valores inferiores a 5, por lo que Chi-cuadrado de independencia no es válida.
+
+$H_0$: No hay relación entre el sexo de la persona y el edificio abandonado que el encuentra más seguro.
+$H_A$: Si existe una relacion entre el sexo de la persona y el edificio abandonado que el encuentra más seguro.
+
+Observaciones independientes: Se cumple (el enunciado especifica que "Cada persona elige por separado, sin conocer la elección de las demás").
+Tabla de contingencia 2x2: Se cumple.
+
+```{r}
+tablita4 <- matrix(c(6, 4, 10, 4), nrow = 2, byrow = TRUE,dimnames = list("Sexo" = c("Mujer", "Hombre"),"Edificio" = c("Escuela", "Centro Comercial")))
+
+# Imprimir las frecuencias esperadas para demostrar por qué no se puede usar Chi-cuadrado
+frecuencias_esperadas_p4 <- chisq.test(tablita4, correct = FALSE)$expected
+print("Frecuencias Esperadas:")
+print(frecuencias_esperadas_p4)
+
+# Prueba de Fisher
+prueba_de_fisher <- fisher.test(tablita4)
+print(prueba_de_fisher)
+```
+
+No hace falta un análisis post-hoc tras la prueba de Fisher.
+Conclusión Pregunta 4: El valor $p$ obtenido es 0.673. Al ser mayor al nivel de significación de 0.05, no existe la evidencia estadística suficiente para rechazar la hipótesis nula. Se concluye que las variables son independientes, es decir, no existe relación entre el sexo de la persona y el edificio abandonado que consideran más seguro.
+
+#Pregunta incognita:
+
+Se llego a identificar que la pregunta con problemas era la 2, ya que en la seccion de observaciones independientes: Se asume por el enunciado en el caso de que eso no cumplirse, los recuentos estarían inflados y la prueba sería inválida por las frecuencias de las muestras.
+
+Si no se cumpliera esta condición, la aproximación de la prueba a la distribución Chi-cuadrado perdería validez, provocando valores p erróneos y haciendo necesario utilizar una prueba exacta (como Fisher).
+el problema es que un animal puede ir varias veces a la misma fuente, creando casos no unicos.
