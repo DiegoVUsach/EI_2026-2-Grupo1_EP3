@@ -1,5 +1,5 @@
 ---
-title: "EP04-avance1-equipo-01.Rmd"
+title: "EP04-respuesta-equipo-01.Rmd"
 output: html_document
 date: "2026-10-15"
 ---
@@ -84,9 +84,9 @@ H0 = La proporción de especies es la misma para ambas reservas.
 H1: En al menos un nivel de las proporciones son distintas en ambas reservas.
 
 Condiciones: Observaciones independientes.
-Hay más de 2 categorías(El enunciado nos da 3 especies)
+Hay más de 2 categorías (El enunciado nos da 3 especies)
 
-La frecuencia de cada categoría es >= 5.
+La frecuencia esperada de cada categoría es >= 5.
 
 ```{r}
 tabla_preg2 <- matrix(c(4, 21, 5,14, 7, 9), nrow = 2, byrow = TRUE, dimnames = list("Reserva" = c("Etosha", "Mahago"),"Especie" = c("Elefante", "Antilope", "Cebra")))
