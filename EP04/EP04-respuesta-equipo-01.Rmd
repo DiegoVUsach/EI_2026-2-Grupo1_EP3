@@ -70,7 +70,7 @@ Este valor es menor al nivel de significancia alfa = (0.05) por lo tanto se rech
 Luego se realizó un procedimiento post-hoc Mcnemar con corrección, el cual reveló que existen diferencias de efectividad entre la estrategia 1 y estrategia 2(p = 0.0016), también se detectó entre estrategia 2 y la 3 (p = 0.0017) y no se detectaron diferencias significativas entre la estrategia 1 y la 3 (p = 0.503), por lo tanto la agencia puede concluir gracias al procedimiento post-hoc que las estrategias de marketing no son igual de efectivas.
 
 
-#Pregunta 2
+# Pregunta 2
 
 Una organización de conservación de la fauna silvestre estudia manadas de tres tipos de animales herbívoros en reservas naturales africanas. Durante tres días consecutivos del mes de febrero, se registró la especie de los animales que se acercaron a beber agua al principal afluente de cada una de las reservas Etosha y Mahago, hasta completar 30 observaciones en cada reserva. Se registraron 4 elefantes, 21 antílopes y 5 cebras en la primera, y 14 elefantes, 7 antílopes y 9 cebras en la segunda.
 
