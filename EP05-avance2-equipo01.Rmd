@@ -1,0 +1,71 @@
+
+---
+title: "EP05 - Equipo 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(pwr)
+```
+#### Link Ia:
+https://share.gemini.google/gLVgzs2kDSKU
+
+## La situación
+El material particulado fino, MP2,5, son partículas de hasta 2,5 micrómetros que quedan suspendidas en el aire y que, al respirarlas, llegan hasta los pulmones. En Santiago su concentración sube en invierno, sobre todo en los días secos y sin viento, cuando una capa de aire más cálido en altura deja atrapado cerca del suelo el aire frío, y con él lo que se emite. El Sistema de Información Nacional de Calidad del Aire (SINCA), del Ministerio del Medio Ambiente, publica lo que miden sus estaciones de monitoreo, y con esos datos se puede preguntar, por ejemplo, si un invierno fue distinto de otro, o si en un mismo invierno el aire de una comuna fue distinto del de otra.
+
+## La discusión con una IA (avance 1)
+
+Elijan una de sus dos preguntas y preséntenle a una IA, en términos generales, el procedimiento post hoc que eligieron y por qué. Pídanle que defienda otro. Está prohibido entregarle el enunciado, los datos o el script, o contarle el estudio con sus palabras. Por ejemplo: "Comparamos seis grupos independientes, nos interesan todos los pares y se cumplen las condiciones, así que elegimos la prueba HSD de Tukey. Defiende que debimos usar pruebas t con la corrección de Holm".
+
+Después, en el .Rmd, respondan a los argumentos de la IA con argumentos propios, y expliquen si mantienen o cambian su elección y por qué. Peguen al comienzo del avance 1 el enlace para compartir la conversación completa (usen un chat normal, no uno temporal) y asegúrense de que el profesor pueda abrirla y descargarla. Si quieren, pueden enviar además un respaldo en PDF al correo del profesor.
+
+## Pregunta 1
+En la estación Las Condes, ¿la concentración diaria promedio de MP2,5 fue la misma en los inviernos de 2018, 2019, 2020 y 2021? En particular, interesa saber si el invierno de 2020, el de las cuarentenas por la pandemia, se diferenció del promedio de los demás inviernos. Si filtraron bien los datos, deberían obtener: 2018, n = 22 y media 25,91; 2019, n = 21 y media 24,05; 2020, n = 23 y media 18,35; 2021, n = 22 y media 27,77 [µg/m³N].
+
+### Que prueba vamos a usar
+R: anova de 1 via para muestras independientes, ya que la escala con la que se mide la variable dependiente tiene intervalos iguales
+
+### Condiciones
+k muestras obtenidas aleatoriamente
+
+Poblacion: sigue una distribución normal
+
+Si las muestras provienen de más de una poblacion tiene la misma varianza (homogeneidad de varianzas)
+
+### Hipotesis
+$H_0$: Las medias poblacionales son iguales ($\mu_1 = \mu_2 = \mu_3 = \mu_4$).
+$H_A$: Al menos un par de grupos tiene medias distintas ($\exists U, V \mid \mu_U \neq \mu_V$).
+
+Levene.
+borrador query ia:
+Eligimos una prueba anova de 1 via para muestras independientes ya que queremos comparar la media de variables independientes. Creemos que una forma de verificar las condiciones es asumir la independencia de las variables
+Se realizara una verificacion de normalidad mediante una prueba de shapiro  y una verificacion de homogeneidad mediante Prueba de 
+
+Según los argumentos que la ia nos entrega, nuestros metodos no son completamente solidos, ya que la prueba t es una prueba robusta frente a violaciones leves de normalidad cuando el tamaño de las muestras es relativamente grande, por lo que no sería estrictamente necesario realizar la prueba de shapiro
+
+La ia nos sugiere una prueba ANOVA de Welch: Es una alternativa robusta al ANOVA tradicional que no asume varianzas iguales entre los grupos.
+Sin embargo, nosotros continuaremos con la propuesta original, ya que se experimentaria menos ruido en la prueba original.
+
+Para la prueba post hoc vamos a utilizar tukey ya que estamos comparando mas de dos grupos. 
+ 
+
+## Pregunta 2
+En el invierno de 2022, ¿la concentración diaria promedio de MP2,5 fue la misma en las estaciones Cerro Navia, La Florida y Quilicura? Es un primer análisis exploratorio: interesa identificar qué pares de estaciones merecen un estudio más detallado, en el que se descartarán los falsos positivos. Si filtraron bien los datos, deberían obtener: Cerro Navia, n = 23 y media 47,74; La Florida, n = 23 y media 44,74; Quilicura, n = 23 y media 45,00 [µg/m³N].
+
+### Que prueba vamos a usar
+ANOVA de una via para muestras independientes porque comparamos la media de una variable continua en tres grupos independientes categoricos.
+
+
+### Condiciones
+Se cumple independencia
+Se verifica homocedasticidad con una prueba de Levene
+normalidad con shapiro wilk
+
+### Hipotesis
+$H_0$: las medias de las concentraciones diarias de MP2,5 en las estaciones Cerro Navia, La Florida y Quilicura en el invierno son iguales
+$H_A$: al menos una de las medias de las concentraciones diarias de MP2,5 en las estaciones Cerro Navia, La Florida y Quilicura en el invierno es diferente
+
+### Procedimiento post hoc
+El procedimiento post hoc a utilizar sera la prueba de tukey ya que estamos comparando mas de dos grupos.
