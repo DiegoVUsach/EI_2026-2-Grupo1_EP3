@@ -219,9 +219,11 @@ Según los resultados de la prueba ómnibus ($p > 0,05$), no existe evidencia es
 Al no encontrar diferencias globales, técnicamente no corresponde aplicar un procedimiento *post-hoc*. De todos modos, para cumplir con el enunciado, realizamos el análisis exploratorio con Fisher y lo comparamos con el ajuste de Holm.
 
 En la práctica, ambos métodos llegan a la misma conclusión: no hay diferencias significativas entre ningún par de estaciones. La diferencia está en cómo manejan los valores *p*. Holm castiga estos valores para controlar los falsos positivos (acercándolos a 1), siendo mucho más conservador, mientras que Fisher no hace ajustes y entrega valores *p* más bajos. Sin embargo, en este caso, ni siquiera el método de Fisher logró detectar diferencias bajo el umbral de 0,05.
+
 ---
 
-
+### Correcion pregunta 2
+Al finalizar la actividad nos dimos cuenta como grupo que nuestro analisis de la pregunta 2 fue errado, utilizando ANOVA independiente cuando no lo era, por eso, aqui esta la correccion:
 
 ## Pregunta 2 - corregida
 
