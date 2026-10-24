@@ -449,7 +449,22 @@ de error en combinaciones lineales.</p>
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>datos_p1 &lt;- datos %&gt;%
     filter(estacion == &quot;Las Condes&quot;, invierno %in% c(2018, 2019, 2020, 2021)) %&gt;%
-    mutate(invierno = as.factor(invierno))</code></pre>
+    mutate(invierno = as.factor(invierno))
+
+# Verificación de filtrado según valores de control del enunciado
+datos_p1 %&gt;%
+    group_by(invierno) %&gt;%
+    summarise(
+        n = n(),
+        media = round(mean(mp25), 2)
+    )</code></pre>
+<pre><code>## # A tibble: 4 × 3
+##   invierno     n media
+##   &lt;fct&gt;    &lt;int&gt; &lt;dbl&gt;
+## 1 2018        22  25.9
+## 2 2019        21  24.0
+## 3 2020        23  18.4
+## 4 2021        22  27.8</code></pre>
 <pre class="r"><code># Gráfico descriptivo de los datos y medias muestrales
 ggplot(datos_p1, aes(x = invierno, y = mp25)) +
     geom_boxplot(fill = &quot;lightblue&quot;, alpha = 0.6, outlier.color = &quot;red&quot;) +
@@ -737,16 +752,21 @@ respalda esto).</p>
 aplicar un procedimiento <em>post-hoc</em>. De todos modos, para cumplir
 con el enunciado, realizamos el análisis exploratorio con Fisher y lo
 comparamos con el ajuste de Holm.</p>
-</div>
-</div>
-<div id="en-la-práctica-ambos-métodos-llegan-a-la-misma-conclusión-no-hay-diferencias-significativas-entre-ningún-par-de-estaciones.-la-diferencia-está-en-cómo-manejan-los-valores-p.-holm-castiga-estos-valores-para-controlar-los-falsos-positivos-acercándolos-a-1-siendo-mucho-más-conservador-mientras-que-fisher-no-hace-ajustes-y-entrega-valores-p-más-bajos.-sin-embargo-en-este-caso-ni-siquiera-el-método-de-fisher-logró-detectar-diferencias-bajo-el-umbral-de-005." class="section level2">
-<h2>En la práctica, ambos métodos llegan a la misma conclusión: no hay
+<p>En la práctica, ambos métodos llegan a la misma conclusión: no hay
 diferencias significativas entre ningún par de estaciones. La diferencia
 está en cómo manejan los valores <em>p</em>. Holm castiga estos valores
 para controlar los falsos positivos (acercándolos a 1), siendo mucho más
 conservador, mientras que Fisher no hace ajustes y entrega valores
 <em>p</em> más bajos. Sin embargo, en este caso, ni siquiera el método
-de Fisher logró detectar diferencias bajo el umbral de 0,05.</h2>
+de Fisher logró detectar diferencias bajo el umbral de 0,05.</p>
+<hr />
+</div>
+<div id="corrección-pregunta-2" class="section level3">
+<h3>Corrección pregunta 2</h3>
+<p>Al finalizar la actividad nos dimos cuenta como grupo que nuestro
+analisis de la pregunta 2 fue errado, utilizando ANOVA independiente
+cuando no lo era, por eso, aqui esta la corrección:</p>
+</div>
 </div>
 <div id="pregunta-2---corregida" class="section level2">
 <h2>Pregunta 2 - corregida</h2>
@@ -806,8 +826,8 @@ exhaustiva, se prioriza minimizar la tasa de falsos negativos
 diferencia), descartando métodos conservadores como Tukey o
 Bonferroni.</p>
 </div>
-<div id="implementación-en-r-tbd" class="section level3">
-<h3>Implementación en R tbd</h3>
+<div id="implementación-en-r-1" class="section level3">
+<h3>Implementación en R</h3>
 <pre class="r"><code># 1. Filtrar los datos para el invierno de 2022 y las tres estaciones de interés
 datos_p2 &lt;- datos %&gt;%
     filter(invierno == 2022, estacion %in% c(&quot;Cerro Navia&quot;, &quot;La Florida&quot;, &quot;Quilicura&quot;)) %&gt;%
@@ -816,8 +836,20 @@ datos_p2 &lt;- datos %&gt;%
         dia = as.factor(fecha)
     )
 
-
-# 2. Reestructurar a formato ancho para calcular las diferencias pareadas por día
+# Verificación de filtrado según valores de control del enunciado
+datos_p2 %&gt;%
+    group_by(estacion) %&gt;%
+    summarise(
+        n = n(),
+        media = round(mean(mp25), 2)
+    )</code></pre>
+<pre><code>## # A tibble: 3 × 3
+##   estacion        n media
+##   &lt;fct&gt;       &lt;int&gt; &lt;dbl&gt;
+## 1 Cerro Navia    23  47.7
+## 2 La Florida     23  44.7
+## 3 Quilicura      23  45</code></pre>
+<pre class="r"><code># 2. Reestructurar a formato ancho para calcular las diferencias pareadas por día
 datos_p2_anchos &lt;- datos_p2 %&gt;%
     select(dia, estacion, mp25) %&gt;%
     pivot_wider(names_from = estacion, values_from = mp25) %&gt;%
@@ -961,14 +993,13 @@ exploratorios, el procedimiento de Fisher LSD no detecta diferencias
 significativas en ningún par (CN vs LF: p = 0,349; CN vs Q: p = 0,207;
 LF vs Q: p = 0,884). Al aplicar la corrección de Holm, los valores p se
 penalizan y aumentan (0,698; 0,622 y 0,884 respectivamente), manteniendo
-la misma conclusión sustantiva. Visualmente, el gráfico de diferencias
-medias confirma esta situación, pues los intervalos de Bonferroni de
-todos los pares abarcan holgadamente el cero.</p>
-<p>En el contexto del estudio, se concluye con un 95% de confianza que
-no hay evidencia para afirmar que la concentración diaria de MP2,5 haya
-sido distinta entre Cerro Navia, La Florida y Quilicura en el invierno
-de 2022. Por ende, no se identifica ningún par de estaciones prioritario
-que amerite ser aislado para una investigación posterior.</p>
+la misma conclusión. Visualmente, el gráfico de diferencias medias
+confirma esta situación, pues los intervalos de Bonferroni de todos los
+pares abarcan holgadamente el cero.</p>
+<p>Por lo tanto, se concluye con un 95% de confianza que no hay
+evidencia para afirmar que la concentración diaria de MP2,5 haya sido
+distinta entre Cerro Navia, La Florida y Quilicura en el invierno de
+2022.</p>
 </div>
 </div>
 

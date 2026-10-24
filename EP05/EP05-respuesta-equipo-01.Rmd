@@ -60,6 +60,14 @@ datos <- read_csv2("EP05 Datos.csv")
 datos_p1 <- datos %>%
     filter(estacion == "Las Condes", invierno %in% c(2018, 2019, 2020, 2021)) %>%
     mutate(invierno = as.factor(invierno))
+
+# Verificación de filtrado según valores de control del enunciado
+datos_p1 %>%
+    group_by(invierno) %>%
+    summarise(
+        n = n(),
+        media = round(mean(mp25), 2)
+    )
 ```
 
 ```{r}
@@ -249,7 +257,7 @@ ANOVA de medidas repetidas, con post-hoc poco conservador debido a que las 3 est
 
 Se selecciona el procedimiento de mínima diferencia significativa de Fisher (Fisher LSD pareado), consistente en pruebas $t$ pareadas sin ajuste en los valores $p$ (p.adjust.method = "none"). Como el enunciado señala expresamente que se trata de un estudio exploratorio y que los falsos positivos se descartarán en una etapa posterior más exhaustiva, se prioriza minimizar la tasa de falsos negativos (aumentando la potencia estadística para detectar cualquier indicio de diferencia), descartando métodos conservadores como Tukey o Bonferroni. 
 
-### Implementación en R tbd
+### Implementación en R
 
 ```{r}
 # 1. Filtrar los datos para el invierno de 2022 y las tres estaciones de interés
@@ -260,6 +268,13 @@ datos_p2 <- datos %>%
         dia = as.factor(fecha)
     )
 
+# Verificación de filtrado según valores de control del enunciado
+datos_p2 %>%
+    group_by(estacion) %>%
+    summarise(
+        n = n(),
+        media = round(mean(mp25), 2)
+    )
 
 # 2. Reestructurar a formato ancho para calcular las diferencias pareadas por día
 datos_p2_anchos <- datos_p2 %>%
