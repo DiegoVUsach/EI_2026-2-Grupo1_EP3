@@ -45,7 +45,7 @@ ANOVA de 1 vía para muestras independientes, ya que la variable dependiente (MP
 
 ### Hipótesis
 
-* $H_0$: Las medias poblacionales son iguales ($\mu_{2018} = \mu_{2019} = \mu_{2020} = \mu_{2021}$).
+* $H_0$: Las medias poblacionales son iguales ($\mu_{2018} = \mu_{2019} = \mu_{2020} = \mu_{2021}$), en nuestro caso seria que la concentración diaria promedio poblacional de MP2,5 en la estación Las Condes es idéntica en los inviernos de 2018, 2019, 2020 y 2021.
 * $H_A$: Al menos un par de grupos tiene medias distintas.
 
 ### Procedimiento Post-Hoc
