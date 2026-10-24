@@ -1,0 +1,219 @@
+---
+title: "EP05 - Equipo 1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ez)
+library(DescTools)
+```
+
+**Link IA:**
+https://share.gemini.google/gLVgzs2kDSKU
+
+## La situación
+
+El material particulado fino, MP2,5, son partículas de hasta 2,5 micrómetros que quedan suspendidas en el aire y que, al respirarlas, llegan hasta los pulmones. En Santiago su concentración sube en invierno, sobre todo en los días secos y sin viento, cuando una capa de aire más cálido en altura deja atrapado cerca del suelo el aire frío, y con él lo que se emite. El Sistema de Información Nacional de Calidad del Aire (SINCA), del Ministerio del Medio Ambiente, publica lo que miden sus estaciones de monitoreo, y con esos datos se puede preguntar, por ejemplo, si un invierno fue distinto de otro, o si en un mismo invierno el aire de una comuna fue distinto del de otra.
+
+## La discusión con una IA (avance 1)
+
+Elegimos una prueba ANOVA de 1 vía para muestras independientes ya que queremos comparar la media de variables independientes. Creemos que una forma de verificar las condiciones es asumir la independencia de las variables. Se realizará una verificación de normalidad mediante una prueba de Shapiro y una verificación de homogeneidad mediante la prueba de Levene.
+
+Según los argumentos que la IA nos entrega, nuestros métodos no son completamente sólidos, ya que la prueba t es una prueba robusta frente a violaciones leves de normalidad cuando el tamaño de las muestras es relativamente grande, por lo que no sería estrictamente necesario realizar la prueba de Shapiro. La IA nos sugiere una prueba ANOVA de Welch: es una alternativa robusta al ANOVA tradicional que no asume varianzas iguales entre los grupos.
+
+Sin embargo, nosotros continuaremos con la propuesta original, ya que el ANOVA estándar tiene mayor potencia matemáStica si se cumplen los supuestos, y validaremos la homocedasticidad empíricamente en lugar de asumir varianzas distintas desde el inicio.
+
+---
+
+## Pregunta 1
+
+En la estación Las Condes, ¿la concentración diaria promedio de MP2,5 fue la misma en los inviernos de 2018, 2019, 2020 y 2021? En particular, interesa saber si el invierno de 2020, el de las cuarentenas por la pandemia, se diferenció del promedio de los demás inviernos. Si filtraron bien los datos, deberían obtener: 2018, n = 22 y media 25,91; 2019, n = 21 y media 24,05; 2020, n = 23 y media 18,35; 2021, n = 22 y media 27,77 [µg/m³N].
+
+### Qué prueba vamos a usar
+
+ANOVA de 1 vía para muestras independientes, ya que la variable dependiente (MP2,5) es numérica continua y se compara entre grupos categóricos independientes.
+
+### Condiciones
+
+* **Independencia:** $k$ muestras obtenidas aleatoriamente y separadas. Si no se cumpliera, usaríamos un ANOVA de medidas repetidas.
+* **Normalidad:** La población sigue una distribución normal (se verificará con Shapiro-Wilk).
+* **Homocedasticidad:** Las muestras tienen la misma varianza (se verificará con Levene). Si fallara, aplicaríamos el ANOVA de Welch
+
+### Hipótesis
+
+* $H_0$: Las medias poblacionales son iguales ($\mu_{2018} = \mu_{2019} = \mu_{2020} = \mu_{2021}$).
+* $H_A$: Al menos un par de grupos tiene medias distintas.
+
+### Procedimiento Post-Hoc
+
+Para la prueba post-hoc utilizaremos el método de Scheffé. Dado que el enunciado nos pide específicamente comparar el año 2020 contra el promedio de los otros tres años, esto constituye un contraste complejo lineal a posteriori. Scheffé es la prueba exacta para controlar la tasa de error en combinaciones lineales.
+
+### Ejecución en R
+
+```{r}
+datos <- read_csv2("EP05 Datos.csv")
+
+datos_p1 <- datos %>%
+    filter(estacion == "Las Condes", invierno %in% c(2018, 2019, 2020, 2021)) %>%
+    mutate(invierno = as.factor(invierno))
+```
+
+```{r}
+# Gráfico descriptivo de los datos y medias muestrales
+ggplot(datos_p1, aes(x = invierno, y = mp25)) +
+    geom_boxplot(fill = "lightblue", alpha = 0.6, outlier.color = "red") +
+    stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "darkblue") +
+    labs(
+        title = "Distribución y Media de MP2,5 por Invierno (Estación Las Condes)",
+        x = "Año del Invierno",
+        y = expression(paste("Concentración de ", MP[2.5], " [", mu, "g/", m^3, "N]")),
+        caption = "El rombo azul indica la media de cada grupo y los puntos rojos representan valores atípicos."
+    ) +
+    theme_bw()
+```
+
+```{r}
+# Comprobar normalidad por grupos para la Pregunta 1
+tapply(datos_p1$mp25, datos_p1$invierno, shapiro.test)
+```
+
+```{r}
+# Gráfico Q-Q para cada invierno en la estación Las Condes
+ggplot(datos_p1, aes(sample = mp25)) +
+    stat_qq(color = "steelblue", alpha = 0.8) +
+    stat_qq_line(color = "firebrick", linetype = "dashed") +
+    facet_wrap(~invierno, scales = "free") +
+    labs(
+        title = "Gráficos Q-Q de Concentración de MP2,5 por Invierno (Las Condes)",
+        x = "Cuantiles teóricos",
+        y = "Cuantiles muestrales [µg/m³N]"
+    ) +
+    theme_bw()
+```
+
+Gracias a la prueba de Shapiro-Wilk y el grafico Q-Q plot, confirmamos que se cumplen las condiciones de normalidad. 
+
+```{r}
+# Prueba de Levene para Pregunta 1
+LeveneTest(mp25 ~ invierno, data = datos_p1)
+```
+
+```{r}
+# ANOVA Ómnibus
+anova_p1 <- aov(mp25 ~ invierno, data = datos_p1)
+summary(anova_p1)
+```
+
+```{r}
+# Contraste de Scheffé (2020 vs Promedio del resto)
+# Niveles ordenados: 2018, 2019, 2020, 2021
+# Pesos del contraste: -1/3, -1/3, 1, -1/3
+contraste_2020 <- matrix(c(-1 / 3, -1 / 3, 1, -1 / 3), ncol = 1)
+ScheffeTest(anova_p1, contrasts = contraste_2020)
+
+# Comparaciones por pares con Holm
+pairwise.t.test(datos_p1$mp25, datos_p1$invierno, p.adjust.method = "holm", pool.sd = TRUE)
+```
+
+### Conclusiones de la Pregunta 1
+Tras verificar que se cumplen las condiciones estadísticas (con valores *p* de Shapiro y Levene mayores a 0.05), realizamos el ANOVA y obtuvimos un valor *p* de 0.0447. Como este valor es menor al nivel de significación $\alpha = 0.05$, se rechaza la hipótesis nula (dato que es apoyado visualmente en el gráfico de cajas y medias muestrales). Por lo tanto, sí corresponde aplicar el procedimiento *post-hoc*, ya que existen diferencias significativas entre al menos un par de inviernos.
+
+Al analizar el contraste específico de Scheffé (2020 contra el promedio de 2018, 2019 y 2021), evaluamos si ese año en particular fue distinto globalmente al resto. Por otro lado, al revisar las comparaciones por pares con la corrección de Holm (requerida por el enunciado), notamos que el único par con una diferencia estadísticamente significativa ($p < 0.05$) es 2020 frente a 2021.
+
+En cuanto al contexto, concluimos que la concentración de $\text{MP}_{2,5}$ en la estación Las Condes no se mantuvo igual en todos los inviernos analizados. Específicamente, el año 2020 (marcado por las cuarentenas) registró niveles de contaminación significativamente más bajos que el invierno de 2021, aunque no encontramos evidencia estadística suficiente para afirmar que haya diferido del promedio general de los demás años analizados.
+
+---
+
+## Pregunta 2
+
+En el invierno de 2022, ¿la concentración diaria promedio de MP2,5 fue la misma en las estaciones Cerro Navia, La Florida y Quilicura? Es un primer análisis exploratorio: interesa identificar qué pares de estaciones merecen un estudio más detallado, en el que se descartarán los falsos positivos. Si filtraron bien los datos, deberían obtener: Cerro Navia, n = 23 y media 47,74; La Florida, n = 23 y media 44,74; Quilicura, n = 23 y media 45,00 [µg/m³N].
+
+### Qué prueba vamos a usar
+
+ANOVA de una vía para muestras independientes porque comparamos la media de una variable continua en tres grupos independientes categóricos.
+
+### Condiciones
+
+* **Independencia:** Se asume por el muestreo aleatorio. Si no se cumpliera, el modelo ANOVA de muestras independientes no podria ser aplicado.
+* **Normalidad:** Se verificará con Shapiro-Wilk. Si no se cumpliera, tendríamos que recurrir a alguna prueba no parametrica.
+* **Homocedasticidad:** Se verificará con Levene. Si no hubiera varianzas iguales, tendríamos que corregir usando un ANOVA de Welch en lugar del estándar.
+
+### Hipótesis
+
+* $H_0$: Las medias de las concentraciones diarias de MP2,5 en las estaciones Cerro Navia, La Florida y Quilicura en el invierno son iguales ($\mu_{CN} = \mu_{LF} = \mu_{Q}$).
+* $H_A$: Al menos una de las medias es diferente.
+
+### Procedimiento Post-Hoc
+
+El procedimiento a utilizar será Fisher (pruebas T sin ajuste). Como el enunciado recalca que es un análisis "exploratorio" y que los falsos positivos "se descartarán en un estudio más detallado", no es pertinente usar métodos conservadores (como Tukey o Holm) que aumenten el riesgo de falsos negativos. Fisher maximiza la sensibilidad estadística.
+
+### Implementación en R
+
+```{r}
+datos_p2 <- datos %>%
+    filter(invierno == 2022, estacion %in% c("Cerro Navia", "La Florida", "Quilicura")) %>%
+    mutate(estacion = as.factor(estacion))
+```
+```{r}
+# Gráfico descriptivo de los datos y medias muestrales
+ggplot(datos_p2, aes(x = estacion, y = mp25)) +
+    geom_boxplot(fill = "lightgreen", alpha = 0.5, outlier.color = "red") +
+    stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "darkgreen") +
+    labs(
+        title = "Distribución y Media de MP2,5 por Estación (Invierno 2022)",
+        x = "Estación de Monitoreo",
+        y = expression(paste("Concentración de ", MP[2.5], " [", mu, "g/", m^3, "N]")),
+        caption = "El rombo verde indica la media de cada grupo."
+    ) +
+    theme_bw()
+```
+
+```{r}
+# Comprobar normalidad por grupos para la Pregunta 2
+tapply(datos_p2$mp25, datos_p2$estacion, shapiro.test)
+```
+
+```{r}
+# Gráfico Q-Q para cada estación en el invierno de 2022
+ggplot(datos_p2, aes(sample = mp25)) +
+    stat_qq(color = "steelblue", alpha = 0.8) +
+    stat_qq_line(color = "firebrick", linetype = "dashed") +
+    facet_wrap(~estacion, scales = "free") +
+    labs(
+        title = "Gráficos Q-Q de Concentración de MP2,5 por Estación (2022)",
+        x = "Cuantiles teóricos",
+        y = "Cuantiles muestrales [µg/m³N]"
+    ) +
+    theme_bw()
+```
+
+A partir de los resultados de Shapiro-Wilk, notamos que Cerro Navia y Quilicura cumplen con la normalidad. Sin embargo, La Florida no cumple este supuesto (p = 0.0042), lo que también se refleja en su gráfico Q-Q. A pesar de esto, como las tres estaciones tienen exactamente el mismo tamaño de muestra (n = 23), el ANOVA resulta ser bastante robusto frente a esta desviación. Por esta razón, y sumado a que la prueba de Levene sí nos validó la homocedasticidad, decidimos continuar con el ANOVA estándar en lugar de pasar a una prueba no paramétrica como Kruskal-Wallis.
+
+```{r}
+# Prueba de Levene para Pregunta 2
+LeveneTest(mp25 ~ estacion, data = datos_p2)
+```
+
+```{r}
+# ANOVA Ómnibus
+anova_p2 <- aov(mp25 ~ estacion, data = datos_p2)
+summary(anova_p2)
+```
+
+```{r}
+# Post-hoc sin ajuste (Fisher LSD para estudio exploratorio)
+pairwise.t.test(datos_p2$mp25, datos_p2$estacion, p.adjust.method = "none", pool.sd = TRUE)
+
+# Comparaciones por pares con Holm (Requerido por enunciado)
+pairwise.t.test(datos_p2$mp25, datos_p2$estacion, p.adjust.method = "holm", pool.sd = TRUE)
+```
+
+### Conclusiones de la Pregunta 2
+
+Según los resultados de la prueba ómnibus ($p > 0,05$), no existe evidencia estadística suficiente para rechazar la hipótesis nula. Esto significa que no podemos afirmar que haya diferencias en la concentración de $\text{MP}_{2,5}$ entre las tres estaciones durante el invierno de 2022 (lo cual, en concordancia con el gráfico de cajas, donde se observa una alta superposición en las distribuciones y una notable cercanía entre los promedios de las tres estaciones, respalda esto).
+
+Al no encontrar diferencias globales, técnicamente no corresponde aplicar un procedimiento *post-hoc*. De todos modos, para cumplir con el enunciado, realizamos el análisis exploratorio con Fisher y lo comparamos con el ajuste de Holm.
+
+En la práctica, ambos métodos llegan a la misma conclusión: no hay diferencias significativas entre ningún par de estaciones. La diferencia está en cómo manejan los valores *p*. Holm castiga estos valores para controlar los falsos positivos (acercándolos a 1), siendo mucho más conservador, mientras que Fisher no hace ajustes y entrega valores *p* más bajos. Sin embargo, en este caso, ni siquiera el método de Fisher logró detectar diferencias bajo el umbral de 0,05.
