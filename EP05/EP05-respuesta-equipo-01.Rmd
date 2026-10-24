@@ -126,7 +126,7 @@ En cuanto al contexto, concluimos que la concentración de $\text{MP}_{2,5}$ en 
 
 ---
 
-## Pregunta 2
+## Pregunta 2 v2
 
 En el invierno de 2022, ¿la concentración diaria promedio de MP2,5 fue la misma en las estaciones Cerro Navia, La Florida y Quilicura? Es un primer análisis exploratorio: interesa identificar qué pares de estaciones merecen un estudio más detallado, en el que se descartarán los falsos positivos. Si filtraron bien los datos, deberían obtener: Cerro Navia, n = 23 y media 47,74; La Florida, n = 23 y media 44,74; Quilicura, n = 23 y media 45,00 [µg/m³N].
 
@@ -136,18 +136,18 @@ ANOVA de una vía para muestras independientes porque comparamos la media de una
 
 ### Condiciones
 
-* **Independencia:** Se asume por el muestreo aleatorio. Si no se cumpliera, el modelo ANOVA de muestras independientes no podria ser aplicado.
-* **Normalidad:** Se verificará con Shapiro-Wilk. Si no se cumpliera, tendríamos que recurrir a alguna prueba no parametrica.
-* **Homocedasticidad:** Se verificará con Levene. Si no hubiera varianzas iguales, tendríamos que corregir usando un ANOVA de Welch en lugar del estándar.
+* **Independencia entre casos:**Cada día analizado debe ser independiente de los demás.Se asume por el muestreo aleatorio. Si no se cumpliera, el modelo ANOVA de muestras independientes no podria ser aplicado.
+* **Normalidad:** En un diseño correlacionado, la población de las diferencias entre las mediciones de cada par de tratamientos debe seguir una distribución normal. Se verifica mediante la prueba de Shapiro-Wilk y gráficos Q-Q de las diferencias.
+* **Esfericidad:** Las varianzas de las diferencias entre todos los pares de niveles del factor deben ser homogéneas. Esta condición se verifica formalmente con la prueba de esfericidad de Mauchly. Si no se cumpliera (p < 0.05), deberíamos aplicar la corrección de Greenhouse-Geisser o Huynh-Feldt.
+* **Escala de la variable dependiente:** La concentración de MP2,5 se mide en $[\mu\text{g/m}^3\text{N}]$, una escala cuantitativa continua de razón.
 
 ### Hipótesis
 
-* $H_0$: Las medias de las concentraciones diarias de MP2,5 en las estaciones Cerro Navia, La Florida y Quilicura en el invierno son iguales ($\mu_{CN} = \mu_{LF} = \mu_{Q}$).
-* $H_A$: Al menos una de las medias es diferente.
+* $H_0$: Las medias de las concentraciones diarias de MP2,5 en las estaciones Cerro Navia, La Florida y Quilicura en el invierno son iguales ($\mu_{CN} = \mu_{LF} = \mu_{Q}$), es decir, se cumple que $\mu_{d_{X-Y}} = 0$.
+* $H_A$: La media de las diferencias entre las concentraciones de dos estaciones para un mismo día es distinta de cero para al menos un par.
 
 ### Procedimiento Post-Hoc
 
-El procedimiento a utilizar será Fisher (pruebas T sin ajuste). Como el enunciado recalca que es un análisis "exploratorio" y que los falsos positivos "se descartarán en un estudio más detallado", no es pertinente usar métodos conservadores (como Tukey o Holm) que aumenten el riesgo de falsos negativos. Fisher maximiza la sensibilidad estadística.
 
 ### Implementación en R
 
@@ -217,3 +217,91 @@ Según los resultados de la prueba ómnibus ($p > 0,05$), no existe evidencia es
 Al no encontrar diferencias globales, técnicamente no corresponde aplicar un procedimiento *post-hoc*. De todos modos, para cumplir con el enunciado, realizamos el análisis exploratorio con Fisher y lo comparamos con el ajuste de Holm.
 
 En la práctica, ambos métodos llegan a la misma conclusión: no hay diferencias significativas entre ningún par de estaciones. La diferencia está en cómo manejan los valores *p*. Holm castiga estos valores para controlar los falsos positivos (acercándolos a 1), siendo mucho más conservador, mientras que Fisher no hace ajustes y entrega valores *p* más bajos. Sin embargo, en este caso, ni siquiera el método de Fisher logró detectar diferencias bajo el umbral de 0,05.
+
+---
+
+## Pregunta 2 - corregida
+
+En el invierno de 2022, ¿la concentración diaria promedio de MP2,5 fue la misma en las estaciones Cerro Navia, La Florida y Quilicura? Es un primer análisis exploratorio: interesa identificar qué pares de estaciones merecen un estudio más detallado, en el que se descartarán los falsos positivos. Si filtraron bien los datos, deberían obtener: Cerro Navia, n = 23 y media 47,74; La Florida, n = 23 y media 44,74; Quilicura, n = 23 y media 45,00 [µg/m³N].
+
+### Qué prueba vamos a usar
+
+ANOVA de medidas repetidas, con post-hoc poco conservador debido a que las 3 estaciones miden los mismos dias del mismo invierno, donde cada dia funciona como un sujeto y se mide en las 3 estaciones
+
+### Condiciones tbd
+
+* **Independencia entre los casos:** Garantizada si las fechas no presentan autocorrelación temporal serial.
+* **Normalidad:** Se verificará con Shapiro-Wilk. Si no se cumpliera, tendríamos que recurrir a alguna prueba no parametrica.
+* **Homocedasticidad:** Se verificará con Levene. Si no hubiera varianzas iguales, tendríamos que corregir usando un ANOVA de Welch en lugar del estándar.
+
+### Hipótesis
+
+* $H_0$: En promedio, no existen diferencias entre las concentraciones de MP2,5 que registran las estaciones para un mismo día. Es decir, para todo par $X, Y \in \{\text{Cerro Navia}, \text{La Florida}, \text{Quilicura}\}$, se cumple que $\mu_{d_{X-Y}} = 0$.
+* $H_A$: La media de las diferencias entre las concentraciones de dos estaciones para un mismo día es distinta de cero para al menos un par.
+
+### Procedimiento Post-Hoc tbd
+
+El procedimiento a utilizar será Fisher (pruebas T sin ajuste). Como el enunciado recalca que es un análisis "exploratorio" y que los falsos positivos "se descartarán en un estudio más detallado", no es pertinente usar métodos conservadores (como Tukey o Holm) que aumenten el riesgo de falsos negativos. Fisher maximiza la sensibilidad estadística.
+
+### Implementación en R tbd
+
+```{r}
+datos_p2 <- datos %>%
+    filter(invierno == 2022, estacion %in% c("Cerro Navia", "La Florida", "Quilicura")) %>%
+    mutate(estacion = as.factor(estacion))
+```
+```{r}
+# Gráfico descriptivo de los datos y medias muestrales
+ggplot(datos_p2, aes(x = estacion, y = mp25)) +
+    geom_boxplot(fill = "lightgreen", alpha = 0.5, outlier.color = "red") +
+    stat_summary(fun = mean, geom = "point", shape = 18, size = 3.5, color = "darkgreen") +
+    labs(
+        title = "Distribución y Media de MP2,5 por Estación (Invierno 2022)",
+        x = "Estación de Monitoreo",
+        y = expression(paste("Concentración de ", MP[2.5], " [", mu, "g/", m^3, "N]")),
+        caption = "El rombo verde indica la media de cada grupo."
+    ) +
+    theme_bw()
+```
+
+```{r}
+# Comprobar normalidad por grupos para la Pregunta 2
+tapply(datos_p2$mp25, datos_p2$estacion, shapiro.test)
+```
+
+```{r}
+# Gráfico Q-Q para cada estación en el invierno de 2022
+ggplot(datos_p2, aes(sample = mp25)) +
+    stat_qq(color = "steelblue", alpha = 0.8) +
+    stat_qq_line(color = "firebrick", linetype = "dashed") +
+    facet_wrap(~estacion, scales = "free") +
+    labs(
+        title = "Gráficos Q-Q de Concentración de MP2,5 por Estación (2022)",
+        x = "Cuantiles teóricos",
+        y = "Cuantiles muestrales [µg/m³N]"
+    ) +
+    theme_bw()
+```
+
+A partir de los resultados de Shapiro-Wilk, notamos que Cerro Navia y Quilicura cumplen con la normalidad. Sin embargo, La Florida no cumple este supuesto (p = 0.0042), lo que también se refleja en su gráfico Q-Q. A pesar de esto, como las tres estaciones tienen exactamente el mismo tamaño de muestra (n = 23), el ANOVA resulta ser bastante robusto frente a esta desviación. Por esta razón, y sumado a que la prueba de Levene sí nos validó la homocedasticidad, decidimos continuar con el ANOVA estándar en lugar de pasar a una prueba no paramétrica como Kruskal-Wallis.
+
+```{r}
+# Prueba de Levene para Pregunta 2
+LeveneTest(mp25 ~ estacion, data = datos_p2)
+```
+
+```{r}
+# ANOVA Ómnibus
+anova_p2 <- aov(mp25 ~ estacion, data = datos_p2)
+summary(anova_p2)
+```
+
+```{r}
+# Post-hoc sin ajuste (Fisher LSD para estudio exploratorio)
+pairwise.t.test(datos_p2$mp25, datos_p2$estacion, p.adjust.method = "none", pool.sd = TRUE)
+
+# Comparaciones por pares con Holm (Requerido por enunciado)
+pairwise.t.test(datos_p2$mp25, datos_p2$estacion, p.adjust.method = "holm", pool.sd = TRUE)
+```
+
+### Conclusiones de la Pregunta 2 
