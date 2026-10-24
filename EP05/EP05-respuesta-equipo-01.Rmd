@@ -8,6 +8,8 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ez)
 library(DescTools)
+library(rstatix)
+library(ggpubr)
 ```
 
 **Link IA:**
@@ -307,10 +309,10 @@ ggerrorplot(
     desc_stat = "mean_ci",
     ci = 1 - alfa_p2 / m_p2,
     color = "steelblue",
-    ylab = expression(paste("Diferencia diaria de ", MP[2.5], " [", mu, "g/", m^3, "N]")),
     xlab = "Comparación entre estaciones",
     title = "Diferencias medias diarias de MP2,5 con intervalos de Bonferroni (Invierno 2022)"
 ) +
+    labs(y = expression(paste("Diferencia diaria de ", MP[2.5], " [", mu, "g/", m^3, "N]"))) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "firebrick") +
     theme_bw()
 ```
