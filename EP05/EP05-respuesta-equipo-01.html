@@ -794,8 +794,8 @@ diferencias entre las concentraciones de dos estaciones para un mismo
 día es distinta de cero para al menos un par.</li>
 </ul>
 </div>
-<div id="procedimiento-post-hoc-tbd" class="section level3">
-<h3>Procedimiento Post-Hoc tbd</h3>
+<div id="procedimiento-post-hoc-2" class="section level3">
+<h3>Procedimiento Post-Hoc</h3>
 <p>Se selecciona el procedimiento de mínima diferencia significativa de
 Fisher (Fisher LSD pareado), consistente en pruebas <span class="math inline">\(t\)</span> pareadas sin ajuste en los valores
 <span class="math inline">\(p\)</span> (p.adjust.method = “none”). Como
@@ -918,7 +918,7 @@ print(post_fisher, width = Inf)</code></pre>
 ## 1    -3.50      9.50 Paired t-test two.sided   0.349 ns          
 ## 2    -1.63      7.11 Paired t-test two.sided   0.207 ns          
 ## 3    -3.94      3.42 Paired t-test two.sided   0.884 ns</code></pre>
-<pre class="r"><code># 8. Comparaciones por pares con corrección de Holm pareada (exigida por pauta)
+<pre class="r"><code># 8. Comparaciones por pares con corrección de Holm pareada
 post_holm &lt;- pairwise_t_test(
     data = datos_p2,
     formula = mp25 ~ estacion,
@@ -941,6 +941,34 @@ print(post_holm, width = Inf)</code></pre>
 </div>
 <div id="conclusiones-de-la-pregunta-2-1" class="section level3">
 <h3>Conclusiones de la Pregunta 2</h3>
+<p>La evaluación de normalidad sobre las diferencias pareadas arrojó
+valores p &gt; 0,05 en la prueba de Shapiro-Wilk para todos los pares
+(CN - LF: p = 0,858; CN - Q: p = 0,584; LF - Q: p = 0,764), lo que se
+corrobora en los gráficos Q-Q donde los puntos siguen las rectas
+teóricas dentro de las bandas de confianza. Sin embargo, la prueba de
+Mauchly resultó estadísticamente significativa (W = 0,505; p = 0,00076),
+evidenciando una violación del supuesto de esfericidad. Como la
+estimación entrega GGe = 0,669 (&gt;= 0,60), siguiendo las directrices
+de la cátedra se aplica la corrección de Huynh-Feldt (HFe = 0,696).</p>
+<p>Con dicha corrección, la prueba ómnibus arroja un estadístico F(1,39;
+30,62) = 0,952 con un valor p = 0,367. Dado que p &gt; 0,05, no existe
+evidencia estadística suficiente para rechazar la hipótesis nula,
+concluyéndose que no se observan diferencias significativas globales
+entre estaciones. Por regla metodológica formal, al no ser significativa
+la prueba ómnibus, no corresponde aplicar un procedimiento post hoc.</p>
+<p>No obstante, al realizar las comparaciones pareadas con fines
+exploratorios, el procedimiento de Fisher LSD no detecta diferencias
+significativas en ningún par (CN vs LF: p = 0,349; CN vs Q: p = 0,207;
+LF vs Q: p = 0,884). Al aplicar la corrección de Holm, los valores p se
+penalizan y aumentan (0,698; 0,622 y 0,884 respectivamente), manteniendo
+la misma conclusión sustantiva. Visualmente, el gráfico de diferencias
+medias confirma esta situación, pues los intervalos de Bonferroni de
+todos los pares abarcan holgadamente el cero.</p>
+<p>En el contexto del estudio, se concluye con un 95% de confianza que
+no hay evidencia para afirmar que la concentración diaria de MP2,5 haya
+sido distinta entre Cerro Navia, La Florida y Quilicura en el invierno
+de 2022. Por ende, no se identifica ningún par de estaciones prioritario
+que amerite ser aislado para una investigación posterior.</p>
 </div>
 </div>
 

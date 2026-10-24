@@ -221,6 +221,8 @@ Al no encontrar diferencias globales, técnicamente no corresponde aplicar un pr
 En la práctica, ambos métodos llegan a la misma conclusión: no hay diferencias significativas entre ningún par de estaciones. La diferencia está en cómo manejan los valores *p*. Holm castiga estos valores para controlar los falsos positivos (acercándolos a 1), siendo mucho más conservador, mientras que Fisher no hace ajustes y entrega valores *p* más bajos. Sin embargo, en este caso, ni siquiera el método de Fisher logró detectar diferencias bajo el umbral de 0,05.
 ---
 
+
+
 ## Pregunta 2 - corregida
 
 En el invierno de 2022, ¿la concentración diaria promedio de MP2,5 fue la misma en las estaciones Cerro Navia, La Florida y Quilicura? Es un primer análisis exploratorio: interesa identificar qué pares de estaciones merecen un estudio más detallado, en el que se descartarán los falsos positivos. Si filtraron bien los datos, deberían obtener: Cerro Navia, n = 23 y media 47,74; La Florida, n = 23 y media 44,74; Quilicura, n = 23 y media 45,00 [µg/m³N].
@@ -241,7 +243,7 @@ ANOVA de medidas repetidas, con post-hoc poco conservador debido a que las 3 est
 * $H_0$: En promedio, no existen diferencias entre las concentraciones de MP2,5 que registran las estaciones para un mismo día. Es decir, para todo par $X, Y \in \{\text{Cerro Navia}, \text{La Florida}, \text{Quilicura}\}$, se cumple que $\mu_{d_{X-Y}} = 0$.
 * $H_A$: La media de las diferencias entre las concentraciones de dos estaciones para un mismo día es distinta de cero para al menos un par.
 
-### Procedimiento Post-Hoc tbd
+### Procedimiento Post-Hoc 
 
 Se selecciona el procedimiento de mínima diferencia significativa de Fisher (Fisher LSD pareado), consistente en pruebas $t$ pareadas sin ajuste en los valores $p$ (p.adjust.method = "none"). Como el enunciado señala expresamente que se trata de un estudio exploratorio y que los falsos positivos se descartarán en una etapa posterior más exhaustiva, se prioriza minimizar la tasa de falsos negativos (aumentando la potencia estadística para detectar cualquier indicio de diferencia), descartando métodos conservadores como Tukey o Bonferroni. 
 
@@ -341,7 +343,7 @@ post_fisher <- pairwise_t_test(
 )
 print(post_fisher, width = Inf)
 
-# 8. Comparaciones por pares con corrección de Holm pareada (exigida por pauta)
+# 8. Comparaciones por pares con corrección de Holm pareada
 post_holm <- pairwise_t_test(
     data = datos_p2,
     formula = mp25 ~ estacion,
@@ -352,6 +354,12 @@ post_holm <- pairwise_t_test(
 print(post_holm, width = Inf)
 ```
 
-
-
 ### Conclusiones de la Pregunta 2 
+
+La evaluación de normalidad sobre las diferencias pareadas arrojó valores p > 0,05 en la prueba de Shapiro-Wilk para todos los pares (CN - LF: p = 0,858; CN - Q: p = 0,584; LF - Q: p = 0,764), lo que se corrobora en los gráficos Q-Q donde los puntos siguen las rectas teóricas dentro de las bandas de confianza. Sin embargo, la prueba de Mauchly resultó estadísticamente significativa (W = 0,505; p = 0,00076), evidenciando una violación del supuesto de esfericidad. Como la estimación entrega GGe = 0,669 (>= 0,60), siguiendo las directrices de la cátedra se aplica la corrección de Huynh-Feldt (HFe = 0,696).
+
+Con dicha corrección, la prueba ómnibus arroja un estadístico F(1,39; 30,62) = 0,952 con un valor p = 0,367. Dado que p > 0,05, no existe evidencia estadística suficiente para rechazar la hipótesis nula, concluyéndose que no se observan diferencias significativas globales entre estaciones. Por regla metodológica formal, al no ser significativa la prueba ómnibus, no corresponde aplicar un procedimiento post hoc.
+
+No obstante, al realizar las comparaciones pareadas con fines exploratorios, el procedimiento de Fisher LSD no detecta diferencias significativas en ningún par (CN vs LF: p = 0,349; CN vs Q: p = 0,207; LF vs Q: p = 0,884). Al aplicar la corrección de Holm, los valores p se penalizan y aumentan (0,698; 0,622 y 0,884 respectivamente), manteniendo la misma conclusión. Visualmente, el gráfico de diferencias medias confirma esta situación, pues los intervalos de Bonferroni de todos los pares abarcan holgadamente el cero.
+
+Por lo tanto, se concluye con un 95% de confianza que no hay evidencia para afirmar que la concentración diaria de MP2,5 haya sido distinta entre Cerro Navia, La Florida y Quilicura en el invierno de 2022.
