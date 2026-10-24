@@ -222,8 +222,8 @@ En la práctica, ambos métodos llegan a la misma conclusión: no hay diferencia
 
 ---
 
-### Correcion pregunta 2
-Al finalizar la actividad nos dimos cuenta como grupo que nuestro analisis de la pregunta 2 fue errado, utilizando ANOVA independiente cuando no lo era, por eso, aqui esta la correccion:
+### Corrección pregunta 2
+Al finalizar la actividad nos dimos cuenta como grupo que nuestro analisis de la pregunta 2 fue errado, utilizando ANOVA independiente cuando no lo era, por eso, aqui esta la corrección:
 
 ## Pregunta 2 - corregida
 
